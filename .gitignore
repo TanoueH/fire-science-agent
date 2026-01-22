@@ -1,0 +1,17 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# local environments
+.venv/
+__pycache__/
+*.pyc
+
+# editors
+.vscode/
+
+# outputs
+output/
+artifacts/
+runs/
