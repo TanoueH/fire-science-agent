@@ -1,0 +1,37 @@
+# ============================================================
+# Fire Science Agent (FSA) — Python Dependencies
+# ============================================================
+# This dependency list supports the research prototype described
+# in the associated IEEE Sensors Journal submission.
+# Versions are fixed to ensure reproducibility.
+# ============================================================
+
+# --- Multi-agent orchestration ---
+crewai==1.4.1
+crewai-tools==1.4.1
+langchain>=1.0.5
+
+# --- Web services and configuration ---
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic>=2.11.0
+python-dotenv>=1.1.1
+pyyaml==6.0.2
+
+# --- AI and language models ---
+openai==1.52.1
+tiktoken==0.8.0
+
+# --- Data processing and analytics ---
+requests==2.32.5
+beautifulsoup4==4.14.2
+scikit-learn==1.7.2
+pandas==2.2.3
+numpy==2.3.4
+
+# --- Logging and utilities ---
+rich==13.9.2
+loguru==0.7.2
+
+# --- Testing ---
+pytest==8.3.3

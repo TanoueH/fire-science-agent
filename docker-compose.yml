@@ -1,0 +1,91 @@
+name: fire-science-agent
+
+services:
+  # =========================
+  # EDGE — Curator / Analyst
+  # =========================
+  edge-curator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fire-science-agent:${APP_VERSION:-paper}
+    container_name: edge-curator
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "curator"]
+    env_file: [".env"]
+    profiles: ["edge"]
+    networks: ["fire-net"]
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    volumes:
+      - runs:/app/runs
+      - artifacts:/app/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "curator"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  edge-analyst:
+    image: fire-science-agent:${APP_VERSION:-paper}
+    container_name: edge-analyst
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "analyst"]
+    env_file: [".env"]
+    profiles: ["edge"]
+    networks: ["fire-net"]
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    volumes:
+      - runs:/app/runs
+      - artifacts:/app/artifacts
+    depends_on:
+      edge-curator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "analyst"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # =========================
+  # CLOUD — Researcher / Scraper / Reporter
+  # =========================
+  cloud-researcher:
+    image: fire-science-agent:${APP_VERSION:-paper}
+    container_name: cloud-researcher
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "researcher"]
+    env_file: [".env"]
+    profiles: ["cloud"]
+    networks: ["fire-net"]
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: ["ALL"]
+    volumes:
+      - runs:/app/runs
+      - artifacts:/app/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "researcher"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  cloud-webscraper:
+    image: fire-science-agent:${APP_VERSION:-paper}
+    container_name: cloud-webscraper
+    command:

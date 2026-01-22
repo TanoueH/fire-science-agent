@@ -1,0 +1,5 @@
+entity_type,identifier,name,context_tags,temperature_C,co_ppm,visibility_m,air_velocity_ms
+sensor,TEMP01,Sensor Temperatura,incendio_tunel,68,45,120,1.5
+sensor,CO02,Sensor CO,incendio_tunel,72,250,90,1.8
+sensor,VIS03,Sensor Visibilidade,incendio_tunel,80,800,35,2.0
+sensor,FLOW04,Sensor Fluxo de Ar,incendio_tunel,85,1200,15,0.5
