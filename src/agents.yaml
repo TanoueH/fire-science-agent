@@ -1,16 +1,13 @@
 version: "1.0"
 
 defaults:
-  model: ${MODEL}
-  offline_mode: ${OFFLINE_MODE:-true}
   seed: ${SEED:-42}
   run_id: ${RUN_ID:-paper-run}
 
 agents:
   curator:
     role: "Curator"
-    description: "Validates and normalizes physical and virtual sensor data."
-    runtime: "edge"
+    description: "Ingests, validates, and normalizes virtual sensor data derived from FDS simulations."
     tools:
       - "LoadCSVTool"
       - "NormalizeSensorsTool"
@@ -18,44 +15,29 @@ agents:
       seed: ${SEED:-42}
       run_id: ${RUN_ID:-paper-run}
 
+  researcher:
+    role: "Researcher"
+    description: "Provides contextual support for rule-base supervision and model-related information."
+    tools:
+      - "SupportContextTool"
+    params:
+      seed: ${SEED:-42}
+      run_id: ${RUN_ID:-paper-run}
+
   analyst:
     role: "Analyst"
-    description: "Runs fuzzy+ML inference for tunnel fire risk estimation."
-    runtime: "edge"
+    description: "Runs hybrid fuzzy--ML inference for tunnel fire-risk estimation."
     tools:
       - "PredictFireTool"
     params:
       seed: ${SEED:-42}
       run_id: ${RUN_ID:-paper-run}
 
-  researcher:
-    role: "Researcher"
-    description: "Retrieves peer-reviewed literature and technical standards metadata."
-    runtime: "cloud"
-    model: ${MODEL}
-    tools:
-      - "FetchLiteratureTool"
-    params:
-      offline: ${OFFLINE_MODE:-true}
-      run_id: ${RUN_ID:-paper-run}
-
-  web_scraper:
-    role: "Web Scraper"
-    description: "Extracts abstracts and metadata from public sources (optional online step)."
-    runtime: "cloud"
-    model: ${MODEL}
-    tools:
-      - "WebScraperTool"
-    params:
-      offline: ${OFFLINE_MODE:-true}
-      run_id: ${RUN_ID:-paper-run}
-
   reporter:
     role: "Reporter"
-    description: "Compiles a Markdown risk bulletin."
-    runtime: "cloud"
-    model: ${MODEL}
+    description: "Compiles monitoring-oriented fire-risk outputs and summaries."
     tools:
       - "CompileReportTool"
     params:
+      seed: ${SEED:-42}
       run_id: ${RUN_ID:-paper-run}

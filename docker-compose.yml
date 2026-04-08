@@ -1,29 +1,29 @@
 name: fire-science-agent
 
 services:
-  # =========================
-  # EDGE — Curator / Analyst
-  # =========================
-  edge-curator:
+  curator:
     build:
       context: .
       dockerfile: Dockerfile
     image: fire-science-agent:${APP_VERSION:-paper}
-    container_name: edge-curator
+    container_name: fsa-curator
     command: ["python", "-m", "fire_agent.cli", "run", "--role", "curator"]
-    env_file: [".env"]
-    profiles: ["edge"]
-    networks: ["fire-net"]
+    env_file:
+      - .env
     restart: "no"
     read_only: true
     tmpfs:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    cap_drop: ["ALL"]
+    cap_drop:
+      - ALL
     volumes:
       - runs:/app/runs
       - artifacts:/app/artifacts
+      - output:/app/output
+    networks:
+      - fire-net
     healthcheck:
       test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "curator"]
       interval: 30s
@@ -31,25 +31,60 @@ services:
       retries: 3
       start_period: 20s
 
-  edge-analyst:
+  researcher:
     image: fire-science-agent:${APP_VERSION:-paper}
-    container_name: edge-analyst
-    command: ["python", "-m", "fire_agent.cli", "run", "--role", "analyst"]
-    env_file: [".env"]
-    profiles: ["edge"]
-    networks: ["fire-net"]
+    container_name: fsa-researcher
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "researcher"]
+    env_file:
+      - .env
     restart: "no"
     read_only: true
     tmpfs:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    cap_drop: ["ALL"]
+    cap_drop:
+      - ALL
     volumes:
       - runs:/app/runs
       - artifacts:/app/artifacts
+      - output:/app/output
+    networks:
+      - fire-net
     depends_on:
-      edge-curator:
+      curator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "researcher"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  analyst:
+    image: fire-science-agent:${APP_VERSION:-paper}
+    container_name: fsa-analyst
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "analyst"]
+    env_file:
+      - .env
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      - runs:/app/runs
+      - artifacts:/app/artifacts
+      - output:/app/output
+    networks:
+      - fire-net
+    depends_on:
+      curator:
+        condition: service_healthy
+      researcher:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "analyst"]
@@ -58,34 +93,40 @@ services:
       retries: 3
       start_period: 20s
 
-  # =========================
-  # CLOUD — Researcher / Scraper / Reporter
-  # =========================
-  cloud-researcher:
+  reporter:
     image: fire-science-agent:${APP_VERSION:-paper}
-    container_name: cloud-researcher
-    command: ["python", "-m", "fire_agent.cli", "run", "--role", "researcher"]
-    env_file: [".env"]
-    profiles: ["cloud"]
-    networks: ["fire-net"]
+    container_name: fsa-reporter
+    command: ["python", "-m", "fire_agent.cli", "run", "--role", "reporter"]
+    env_file:
+      - .env
     restart: "no"
     read_only: true
     tmpfs:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    cap_drop: ["ALL"]
+    cap_drop:
+      - ALL
     volumes:
       - runs:/app/runs
       - artifacts:/app/artifacts
+      - output:/app/output
+    networks:
+      - fire-net
+    depends_on:
+      analyst:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "researcher"]
+      test: ["CMD", "python", "-m", "fire_agent.cli", "health", "--role", "reporter"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
 
-  cloud-webscraper:
-    image: fire-science-agent:${APP_VERSION:-paper}
-    container_name: cloud-webscraper
-    command:
+networks:
+  fire-net:
+
+volumes:
+  runs:
+  artifacts:
+  output:

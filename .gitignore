@@ -15,3 +15,11 @@ __pycache__/
 output/
 artifacts/
 runs/
+
+# Large FDS artifacts
+data/fds_inputs/
+data/fds_outputs/
+__pycache__/
+*.pyc
+
+src/output/

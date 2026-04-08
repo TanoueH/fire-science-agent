@@ -1,42 +1,30 @@
 tasks:
   - id: task_load
-    description: "Carregar CSV de sensores."
+    description: "Load virtual sensor data from CSV."
     tool: LoadCSVTool
     params:
       path: ${INPUT_CSV}
     output: sensors.json
 
   - id: task_normalize
-    description: "Normalizar unidades (°C, ppm, m/s) e validar ranges críticos."
+    description: "Normalize sensor variables and validate the input structure."
     tool: NormalizeSensorsTool
     input: sensors.json
     output: normalized.json
 
-  - id: task_lit
-    description: "Buscar normas e artigos técnicos relevantes (NFPA, PIARC, ABNT, artigos científicos)."
-    tool: FetchLiteratureTool
-    input: normalized.json
-    output: literature.json
-
-  - id: task_web_scraper
-    description: "Extrair resumos e metadados de relatórios oficiais a partir dos links recuperados."
-    tool: WebScraperTool
-    input: literature.json
-    output: abstracts.json
-
   - id: task_predict
-    description: "Rodar modelo fuzzy + ML para previsão de risco de incêndio e evolução da fumaça."
+    description: "Run hybrid fuzzy--ML fire-risk estimation."
     tool: PredictFireTool
     input: normalized.json
+    params:
+      alpha: ${ALPHA}
     output: risk.json
 
   - id: task_report
-    description: "Gerar Boletim Automático de Risco em formato Markdown."
+    description: "Generate a monitoring-oriented fire-risk report in Markdown format."
     tool: CompileReportTool
     input:
       - normalized.json
-      - literature.json
-      - abstracts.json
       - risk.json
     params:
       output_path: ${REPORT_FILE}

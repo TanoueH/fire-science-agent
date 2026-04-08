@@ -1,130 +1,179 @@
-Fire Science Agent (FSA)
+# Fire Science Agent
 
-This repository provides a research prototype of the Fire Science Agent (FSA),
-a distributed multi-agent framework for intelligent fire-risk assessment in tunnel environments.
-The system integrates physical and virtual sensing (soft sensors), fuzzy-logic inference, and
-machine-learning models within a containerized, reproducible architecture.
+A compact, audit-oriented, and reproducible repository associated with the paper **“A Multi-Agent Intelligent Sensing Framework for Tunnel Fire Detection.”**
 
-1. Scope and Disclaimer
+This repository contains the core workflow used to support the paper, including curated sensor data derived from processed *Fire Dynamics Simulator* (FDS) tunnel-fire outputs, a modular multi-agent pipeline, and the minimum configuration artifacts required for technical inspection and reproducibility.
 
-This code is provided exclusively for research, reproducibility, and technical auditing purposes.
-It is not intended for direct operational deployment in safety-critical environments without
-additional validation, certification, and regulatory approval.
+## Overview
 
-The implementation prioritizes architectural transparency, traceability, and repeatability over
-operational performance.
+Tunnel fire detection and risk interpretation require the integration of heterogeneous sensing signals, scenario-aware data processing, and structured analytical reasoning. In this work, the repository supports a multi-agent workflow organized around four logical roles:
 
-2. Related Publication
+- **Curator** — validates and standardizes the input sensor dataset;
+- **Researcher** — interprets scenario behavior and signal patterns;
+- **Analyst** — performs hybrid risk-oriented inference using fuzzy logic and machine learning concepts;
+- **Reporter** — produces a compact analytical report for inspection and audit.
 
-This repository supports the paper:
+The repository is intentionally lightweight. It is **not** a full archival mirror of the dissertation environment, nor a storage location for large raw FDS outputs. Instead, it provides a curated and traceable implementation aligned with the paper workflow.
 
-H. M. Tanoue and S. J. C. Almeida
-Fire Science Agent: A Distributed Intelligent Sensing Framework for Tunnel Fire Detection Using Fuzzy Logic and Machine Learning
-submitted to IEEE Sensors Journal, 2026.
+## Repository Scope
 
-The codebase reflects the architectural concepts, agent roles, and hybrid fuzzy–ML inference pipeline
-described in the manuscript and is intended to serve as supplementary material for reproducibility.
+This repository was designed to support:
 
-3. System Overview
+- workflow reproducibility;
+- inspection of the multi-agent sensing pipeline;
+- auditability of curated sensor data used in the article;
+- lightweight replication of the paper-oriented processing flow.
 
-The Fire Science Agent is built upon:
+This repository was **not** designed to store:
 
-CrewAI for multi-agent orchestration
+- full dissertation chapters or thesis materials;
+- large raw FDS output directories;
+- Smokeview image/video collections;
+- deprecated infrastructure not used in the final paper workflow;
+- legacy cloud, scraper, MQTT, or overextended edge/cloud orchestration components.
 
-Docker / Docker Compose for deterministic and reproducible execution
+## Main Components
 
-FastAPI for inference and reporting services
-
-Offline-first data pipelines with optional online enrichment
-
-Hybrid fuzzy-logic and machine-learning reasoning for fire-risk estimation
-
-Conceptual Multi-Agent Workflow
-
-The system is organized into the following logical roles:
-
-Curator
-Acquisition, preprocessing, normalization, and validation of heterogeneous sensor data.
-
-Analyst
-Hybrid fuzzy-logic and machine-learning inference to compute a continuous Fire Risk Index (FRI).
-
-Researcher (optional, online)
-Retrieval of metadata from scientific literature and technical standards to support contextual
-interpretation.
-
-Web Scraper (optional, online)
-Extraction of publicly accessible abstracts and technical summaries for enrichment purposes.
-
-Reporter
-Compilation of human-readable decision-support reports in Markdown format.
-
-By default, the edge pipeline (Curator + Analyst) is fully reproducible and operates
-without external network access.
-Cloud-based enrichment agents are disabled unless explicitly enabled.
-
-4. Reproducibility Model
-
-Reproducibility is enforced through:
-
-Deterministic task orchestration (tasks.yaml)
-
-Explicit agent role definitions (agents.yaml)
-
-Offline-first execution (OFFLINE_MODE=true)
-
-Fixed random seeds and run identifiers
-
-Containerized execution without runtime dependency installation
-
-Explicit persistence of all intermediate and final artifacts
-
-All experiments reported in the paper can be reproduced using the production
-Compose specification.
-
-5. Repository Structure
-
-fire-science-agent/
-├── src/
-│   ├── main.py            # Pipeline runner and FastAPI entry point
-│   ├── agents.yaml        # Agent roles and tool bindings
-│   ├── tasks.yaml         # Deterministic task pipeline
-│   └── custom_tool.py     # Tool implementations (Python classes)
-│
-├── data/                  # Input datasets (e.g., sample sensor CSV)
-├── output/                # Generated reports and results (not versioned)
-├── artifacts/             # Intermediate artifacts for auditing
-│
-├── Dockerfile             # Deterministic container build
-├── compose.prod.yml       # Paper-ready execution environment
-├── requirements.txt       # Frozen Python dependencies
+```text
+.
+├── Dockerfile
+├── LICENSE
 ├── README.md
-└── CITATION.cff
+├── docker-compose.yml
+├── requirements.txt
+├── data
+│   └── curated
+│       └── dataset_all_scenarios_long.csv
+└── src
+    ├── __init__.py
+    ├── agents.yaml
+    ├── custom_tool.py
+    ├── main.py
+    ├── tasks.yaml
+    └── output/
 
+Core files
+src/main.py
+Main entry point for the Fire Science Agent pipeline.
+src/custom_tool.py
+Auxiliary data processing and analytical logic used by the workflow.
+src/agents.yaml
+Definition of the logical agent roles used in the framework.
+src/tasks.yaml
+Definition of the pipeline task sequence.
+data/curated/dataset_all_scenarios_long.csv
+Curated dataset derived from processed FDS-based tunnel-fire outputs.
+src/output/
+Directory used for execution-generated outputs.
+Dataset Description
 
-Note:
-Directories such as output/ and artifacts/ are generated at runtime and are excluded from
-version control.
+The repository includes a curated dataset derived from processed FDS tunnel-fire simulation outputs representing a 50 m tunnel-fire segment and three representative scenarios:
 
-6. Execution
-Production / Paper-Ready Execution
+S1
+S2
+S3
+
+The data reflect the sensing logic described in the paper, using virtual sensors and the main physical variables considered in the framework:
+
+temperature;
+visibility;
+carbon monoxide concentration (CO);
+longitudinal smoke velocity.
+
+The included dataset is processed and curated, not raw simulation output. Its purpose is to support reproducibility and auditability at repository level without inflating the project with heavy simulation artifacts.
+
+Methodological Alignment with the Paper
+
+The repository is aligned with the final paper design, which adopts:
+
+an FDS-based tunnel-fire scenario;
+three representative fire and ventilation scenarios;
+ten virtual sensors;
+hybrid analytical reasoning based on fuzzy logic and machine learning;
+a modular multi-agent architecture centered on curation, interpretation, analysis, and reporting.
+
+Legacy components from earlier exploratory stages were intentionally excluded from the final repository workflow when not required by the submitted manuscript.
+
+Installation
+Local environment
+
+Create and activate a Python environment, then install the dependencies:
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+Environment file
+
+Copy the example environment file if needed:
 
 cp .env.example .env
-docker compose -f compose.prod.yml --profile edge --profile cloud up --build
 
+Then edit .env according to your local execution preferences.
 
-Outputs:
+Execution
+Local execution
 
-Fire-risk report: output/report.md
+The repository uses src/main.py as the main entry point.
 
-Intermediate artifacts: artifacts/
+Run:
 
-Optional audit manifest (if enabled)
+python src/main.py
 
-Offline Reproduction (Default)
-OFFLINE_MODE=true docker compose -f compose.prod.yml --profile edge up
+The execution behavior is controlled by the repository configuration and environment variables defined in .env.example.
 
-7. Citation
+Docker execution
 
-If you use this code or build upon it, please cite the associated paper and/or
-the repository metadata provided in CITATION.cff.
+Build and run with Docker Compose:
+
+docker compose up --build
+
+The containerized execution uses the configuration declared in docker-compose.yml.
+
+Generated Outputs
+
+Runtime-generated artifacts may be written to src/output/ depending on the execution path configured in the local environment.
+
+These files are considered execution outputs rather than primary repository assets.
+
+Reproducibility Notes
+
+This repository is intentionally compact. The guiding principle is paper-level reproducibility, not full-environment archival storage.
+
+Accordingly:
+
+the included dataset is curated and audit-ready;
+large raw FDS outputs are excluded from version control;
+the pipeline structure is kept readable and minimal;
+the repository reflects the final scientific workflow described in the article.
+Auditability
+
+This repository supports technical audit in three complementary ways:
+
+Traceable data origin
+The included dataset is derived from processed FDS simulation outputs rather than synthetic placeholder data.
+Explicit modular roles
+Agent roles and task flow are defined in YAML files, improving readability and inspection.
+Compact execution surface
+The repository avoids unnecessary infrastructure, making the core logic easier to verify.
+Limitations
+
+This repository should not be interpreted as:
+
+a complete CFD reproducibility package for rerunning all simulations from scratch;
+a complete archive of the broader dissertation project;
+a benchmark repository for exhaustive machine-learning model comparison;
+a storage location for large-scale raw numerical outputs.
+
+Its purpose is narrower and more practical: to provide a clean, inspectable, and reproducible companion repository for the submitted paper.
+
+Citation
+
+If you use this repository in academic or technical work, please cite the associated paper:
+
+A Multi-Agent Intelligent Sensing Framework for Tunnel Fire Detection
+Submitted to IEEE Sensors Journal.
+
+License
+
+This project is distributed under the terms specified in the LICENSE file.
