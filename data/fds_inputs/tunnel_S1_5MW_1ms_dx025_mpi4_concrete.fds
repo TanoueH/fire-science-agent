@@ -1,0 +1,182 @@
+&HEAD CHID='tunnel_S1_05MW_1ms_dx025_mpi4_concrete',
+      TITLE='Tunnel fire - S1 (05 MW, 1.0 m/s) - 50 m domain, dx=0.25 m, concrete walls, 4 MPI meshes' /
+
+&MISC TMPA=20.0 /
+
+! =========================================================
+! DOMAIN
+! x = longitudinal
+! y = vertical
+! z = transversal
+! Computational domain based on Santos-Guaruja immersed tunnel reference section
+! Dimensions adjusted to fit dx = 0.25 m
+! Length = 50.0 m
+! Height = 7.25 m
+! Width  = 13.25 m  -> z = -6.625 to +6.625
+! =========================================================
+
+&MESH IJK=50,29,53, XB= 0.0,12.5, 0.0,7.25, -6.625,6.625 /
+&MESH IJK=40,29,53, XB=12.5,22.5, 0.0,7.25, -6.625,6.625 /
+&MESH IJK=40,29,53, XB=22.5,32.5, 0.0,7.25, -6.625,6.625 /
+&MESH IJK=70,29,53, XB=32.5,50.0, 0.0,7.25, -6.625,6.625 /
+
+&TIME T_END=600.0 /
+&PRES TUNNEL_PRECONDITIONER=T /
+
+! =========================================================
+! REACTION
+! =========================================================
+
+&REAC FUEL='N-HEPTANE',
+      SOOT_YIELD=0.05,
+      CO_YIELD=0.01,
+      RADIATIVE_FRACTION=0.35 /
+
+! =========================================================
+! MATERIALS
+! =========================================================
+
+&MATL ID='CONCRETE',
+      DENSITY=2200.0,
+      CONDUCTIVITY=1.7,
+      SPECIFIC_HEAT=0.88 /
+
+! =========================================================
+! SURFACES
+! =========================================================
+
+&SURF ID='BURNER_S1',
+      HRRPUA=500.0,
+      COLOR='ORANGE',
+      RAMP_Q='FIRE_RAMP' /
+
+&RAMP ID='FIRE_RAMP', T=0.0,  F=0.00 /
+&RAMP ID='FIRE_RAMP', T=30.0, F=0.25 /
+&RAMP ID='FIRE_RAMP', T=60.0, F=1.00 /
+
+&SURF ID='INFLOW_1MS',
+      VEL=1.0,
+      COLOR='INVISIBLE' /
+
+&SURF ID='CONCRETE_WALL',
+      MATL_ID='CONCRETE',
+      THICKNESS=0.20,
+      BACKING='INSULATED',
+      COLOR='GRAY' /
+
+! =========================================================
+! FIRE SOURCE
+! Area = 10 m2
+! x = 24.0 to 26.0
+! z = -2.5 to 2.5
+! Total HRR = 500 kW/m2 * 10 m2 = 5 MW
+! =========================================================
+
+&VENT XB=24.0,26.0, 0.0,0.0, -2.5,2.5, SURF_ID='BURNER_S1' /
+
+! =========================================================
+! BOUNDARY CONDITIONS
+! =========================================================
+
+&VENT PBX=0.0,  SURF_ID='INFLOW_1MS' /
+&VENT PBX=50.0, SURF_ID='OPEN' /
+
+! Piso de concreto com abertura na região do queimador
+&VENT XB=0.0,24.0, 0.0,0.0, -6.625,6.625, SURF_ID='CONCRETE_WALL' /
+&VENT XB=26.0,50.0, 0.0,0.0, -6.625,6.625, SURF_ID='CONCRETE_WALL' /
+&VENT XB=24.0,26.0, 0.0,0.0, -6.625,-2.5, SURF_ID='CONCRETE_WALL' /
+&VENT XB=24.0,26.0, 0.0,0.0,  2.5, 6.625, SURF_ID='CONCRETE_WALL' /
+
+! Teto
+&VENT PBY=7.25, SURF_ID='CONCRETE_WALL' /
+
+! Paredes laterais
+&VENT PBZ=-6.625, SURF_ID='CONCRETE_WALL' /
+&VENT PBZ=6.625,  SURF_ID='CONCRETE_WALL' /
+
+! =========================================================
+! SLICES
+! =========================================================
+
+&SLCF PBZ=0.0, QUANTITY='TEMPERATURE', CELL_CENTERED=T /
+&SLCF PBZ=0.0, QUANTITY='VELOCITY', VECTOR=T /
+&SLCF PBZ=0.0, QUANTITY='VISIBILITY', CELL_CENTERED=T /
+&SLCF PBZ=0.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE', CELL_CENTERED=T /
+&SLCF PBX=25.0, QUANTITY='TEMPERATURE', CELL_CENTERED=T /
+
+! =========================================================
+! OUTPUT CONTROL
+! =========================================================
+
+&DUMP DT_DEVC=1.0, DT_SLCF=5.0, DT_BNDF=5.0, NFRAMES=120 /
+
+&BNDF QUANTITY='WALL TEMPERATURE' /
+
+! =========================================================
+! VIRTUAL SENSORS
+! x = 15, 20, 25, 30, 35 m
+! y = 6.80 m
+! z = -3.0 and +3.0 m
+! Variables:
+! TEMPERATURE
+! VISIBILITY
+! CO volume fraction
+! U-VELOCITY
+! =========================================================
+
+! ---- x = 15 m
+&DEVC ID='T_S01',   XYZ=15.0,6.80,-3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S01', XYZ=15.0,6.80,-3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S01',  XYZ=15.0,6.80,-3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S01',   XYZ=15.0,6.80,-3.0, QUANTITY='U-VELOCITY' /
+
+&DEVC ID='T_S02',   XYZ=15.0,6.80, 3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S02', XYZ=15.0,6.80, 3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S02',  XYZ=15.0,6.80, 3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S02',   XYZ=15.0,6.80, 3.0, QUANTITY='U-VELOCITY' /
+
+! ---- x = 20 m
+&DEVC ID='T_S03',   XYZ=20.0,6.80,-3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S03', XYZ=20.0,6.80,-3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S03',  XYZ=20.0,6.80,-3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S03',   XYZ=20.0,6.80,-3.0, QUANTITY='U-VELOCITY' /
+
+&DEVC ID='T_S04',   XYZ=20.0,6.80, 3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S04', XYZ=20.0,6.80, 3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S04',  XYZ=20.0,6.80, 3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S04',   XYZ=20.0,6.80, 3.0, QUANTITY='U-VELOCITY' /
+
+! ---- x = 25 m
+&DEVC ID='T_S05',   XYZ=25.0,6.80,-3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S05', XYZ=25.0,6.80,-3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S05',  XYZ=25.0,6.80,-3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S05',   XYZ=25.0,6.80,-3.0, QUANTITY='U-VELOCITY' /
+
+&DEVC ID='T_S06',   XYZ=25.0,6.80, 3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S06', XYZ=25.0,6.80, 3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S06',  XYZ=25.0,6.80, 3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S06',   XYZ=25.0,6.80, 3.0, QUANTITY='U-VELOCITY' /
+
+! ---- x = 30 m
+&DEVC ID='T_S07',   XYZ=30.0,6.80,-3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S07', XYZ=30.0,6.80,-3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S07',  XYZ=30.0,6.80,-3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S07',   XYZ=30.0,6.80,-3.0, QUANTITY='U-VELOCITY' /
+
+&DEVC ID='T_S08',   XYZ=30.0,6.80, 3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S08', XYZ=30.0,6.80, 3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S08',  XYZ=30.0,6.80, 3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S08',   XYZ=30.0,6.80, 3.0, QUANTITY='U-VELOCITY' /
+
+! ---- x = 35 m
+&DEVC ID='T_S09',   XYZ=35.0,6.80,-3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S09', XYZ=35.0,6.80,-3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S09',  XYZ=35.0,6.80,-3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S09',   XYZ=35.0,6.80,-3.0, QUANTITY='U-VELOCITY' /
+
+&DEVC ID='T_S10',   XYZ=35.0,6.80, 3.0, QUANTITY='TEMPERATURE' /
+&DEVC ID='VIS_S10', XYZ=35.0,6.80, 3.0, QUANTITY='VISIBILITY' /
+&DEVC ID='CO_S10',  XYZ=35.0,6.80, 3.0, QUANTITY='VOLUME FRACTION', SPEC_ID='CARBON MONOXIDE' /
+&DEVC ID='U_S10',   XYZ=35.0,6.80, 3.0, QUANTITY='U-VELOCITY' /
+
+&TAIL /

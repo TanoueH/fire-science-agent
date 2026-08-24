@@ -17,7 +17,9 @@ artifacts/
 runs/
 
 # Large FDS artifacts
-data/fds_inputs/
+# FDS inputs are versioned for reproducibility.
+# FDS outputs remain ignored because they can be regenerated
+# from the tracked input files.
 data/fds_outputs/
 __pycache__/
 *.pyc
