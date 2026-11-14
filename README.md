@@ -9,6 +9,15 @@ This repository now also contains the author-approved revision of the manuscript
 - `docs/reproducibility.md` gives the reproduction sequence and the study's limits.
 - `paper/STATUS_EAAI_2026-11-14.md` records the manuscript and deposit status.
 
+## Zenodo archive
+
+The reproducibility package is publicly archived on Zenodo:
+
+- Current deposited version (version 2): [DOI 10.5281/zenodo.24231837](https://doi.org/10.5281/zenodo.24231837) ([record](https://zenodo.org/records/24231837)).
+- Concept DOI for the record across versions: [10.5281/zenodo.24229182](https://doi.org/10.5281/zenodo.24229182).
+
+Cite the version DOI above when referring to the exact archived package. The Zenodo deposit is an archival record; it does not submit the manuscript to EAAI.
+
 The current study evaluates contemporaneous reconstruction of temperature, visibility, and carbon monoxide at six omitted virtual measurement sites using four observed sites. It compares nearest-site and spatial-linear baselines with Ridge and random-forest regression across nine CFD cases: six development cases and three reserved cases evaluated once after the protocol was frozen.
 
 The results do **not** establish general machine-learning superiority or a novel inference algorithm. The four-band severity rule is a local research criterion; it has not been validated as a human-safety limit, alarm threshold, or operational risk level. The study does not include physical fire-test validation, mesh-convergence analysis, a second geometry, or operational evaluation.
@@ -23,4 +32,4 @@ This work was carried out with support from the National Council for Scientific 
 
 ## Status
 
-Prof. Saulo approved the revised manuscript modifications on 14 November 2026. The manuscript has not yet been resubmitted to EAAI. The public package is present in this repository, but no DOI-registered archival deposit has been created.
+Prof. Saulo approved the revised manuscript modifications on 14 November 2026. The reproducibility package is publicly archived on Zenodo under the version DOI [10.5281/zenodo.24231837](https://doi.org/10.5281/zenodo.24231837); the concept DOI is [10.5281/zenodo.24229182](https://doi.org/10.5281/zenodo.24229182). The manuscript has not yet been resubmitted to EAAI.
