@@ -5,7 +5,7 @@
 - **Coauthor approval:** Prof. Saulo approved the revised manuscript modifications.
 - **Funding statement:** This work was carried out with support from the National Council for Scientific and Technological Development (CNPq), Brazil, under Funding Code 131754/2025-4.
 - **Submission:** Not yet resubmitted; no acceptance decision.
-- **Data archive:** Two reproducibility packages are included in this repository. No DOI-registered archival deposit has been created.
+- **Data archive:** The nine-scenario reproducibility package is publicly archived on Zenodo. Version 2 DOI: [10.5281/zenodo.24231837](https://doi.org/10.5281/zenodo.24231837); concept DOI: [10.5281/zenodo.24229182](https://doi.org/10.5281/zenodo.24229182). The archive is separate from journal submission.
 
 ## Scientific scope
 
